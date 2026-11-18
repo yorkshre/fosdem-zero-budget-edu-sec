@@ -1,17 +1,16 @@
-version: '3.8'
-
 services:
   vaultwarden:
     image: vaultwarden/server:latest
     container_name: school-vaultwarden
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       - SIGNUPS_ALLOWED=false
       - INVITATIONS_ALLOWED=true
-      - ADMIN_TOKEN=${VAULTWARDEN_ADMIN_TOKEN:-changeme_super_secret_token}
-      - DOMAIN=http://localhost:8080
+      - DOMAIN=${VAULTWARDEN_DOMAIN:-http://localhost:8080}
     volumes:
-      - ./vw-data:/data
+      - ./data/vaultwarden:/data
     ports:
       - "127.0.0.1:8080:80"
     networks:
@@ -21,13 +20,14 @@ services:
     image: pihole/pihole:latest
     container_name: school-pihole
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      TZ: 'Europe/Warsaw'
-      WEBPASSWORD: ${PIHOLE_PASSWORD:-changeme_pihole_pass}
+      TZ: ${TZ:-Europe/Warsaw}
       DNSMASQ_LISTENING: 'local'
     volumes:
-      - './etc-pihole:/etc/pihole'
-      - './etc-dnsmasq.d:/etc/dnsmasq.d'
+      - './data/pihole/etc-pihole:/etc/pihole'
+      - './data/pihole/etc-dnsmasq.d:/etc/dnsmasq.d'
     ports:
       - "127.0.0.1:5353:53/tcp"
       - "127.0.0.1:5353:53/udp"
